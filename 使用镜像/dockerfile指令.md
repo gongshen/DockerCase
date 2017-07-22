@@ -95,4 +95,54 @@ $ cat Dockerfile | docker build -
 $ docker build - < context.tar.gz
 ```
 
-# `COPY`：复制
+# `COPY`：复制文件
+格式：
+- COPY <源路径>...<目标路径>
+- COPY ["<源路径1>",..."<目标路径>"]
+
+```dockerfile
+ COPY package.json /usr/src/app
+#可以是通配符
+ COPY hom* /mydir/
+ COPY hom?.txt /mydir/
+```
+**注意**：源文件的各种元数据（权限，变更时间）都会保留。
+
+# `ADD`：更高级的复制文件（需要自动解压缩时用）
+有个功能非常有用：如果源路径是压缩文件，它会自动解压到目标路径去。
+```dockerfile
+FROM scratch
+ADD ubuntu-xenial-core-cloudimg-amd64-root.tar.gz /
+```
+
+# `CMD`：指定容器启动程序和参数
+格式：
+- shell格式：CMD <命令>
+- exec格式：CMD ["可执行文件","参数1","参数2"...]
+- 参数列表格式：CMD ["参数1","参数2"...]，在指定了`ENTRYPOINT`指令后，用`CMD`指定具体的参数。
+
+```dockerfile
+CMD echo $HOME
+# 其实就等于
+CMD ["sh","-c","echo $HOME"]
+```
+那么如果你要将nginx程序在前台运行；
+```dockerfile
+CMD ["nginx","-g","daemon off;"]
+```
+
+# `ENTYRPOINT`：入口点
+
+### 使用一：让镜像变成像命令一样使用
+得知自己当前公网ip的镜像
+```dockerfile
+FROM ubuntu:14.04
+RUN apt-get update \
+	&& apt-get install -y curl \
+	&& rm -rf /var/lib/apt/list/* 
+	CMD ["curl","-s","http://ip.cn"]
+```
+使用`docker build -t myip .`来构建镜像，如果需要查询ip：
+```shell
+$ docker run myip
+```
