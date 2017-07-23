@@ -145,4 +145,11 @@ RUN apt-get update \
 使用`docker build -t myip .`来构建镜像，如果需要查询ip：
 ```shell
 $ docker run myip
+当前 IP：116.224.202.178 来自：上海市 电信
+```
+如果你想希望加入`-i`参数：
+错误做法：
+```shell
+#因为加了参数-i的话，运行时会默认替换掉CMD的默认值
+$ docker run myip -i
 ```
